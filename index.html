@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TNT BURGUER - Hambúrgueria Artesanal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>*{font-family:'Poppins',sans-serif;-webkit-tap-highlight-color:transparent}body{background:#0a0a0a}.no-scrollbar::-webkit-scrollbar{display:none}.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}input,textarea{font-size:16px!important}</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2A33A">
+</head>
+<body class="bg-[#0a0a0a] text-white antialiased">
+<div class="max-w-[480px] mx-auto min-h-screen bg-[#121212] relative shadow-2xl">
+<section id="screen-menu" class="min-h-screen">
+<div class="sticky top-0 z-40 bg-[#121212]/95 backdrop-blur-xl">
+<div class="px-4 pt-5 pb-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-[54px] h-[54px] bg-[#F2A33A] rounded-[16px] flex items-center justify-center"><span class="text-black font-black text-[32px]">T</span></div>
+<div><h1 class="text-[20px] font-black leading-none"><span class="text-white">TNT</span> <span class="text-[#F2A33A]">BURGUER</span></h1><p class="text-[10px] text-zinc-500 mt-1 tracking-widest">HAMBURGUERIA ARTESANAL · NA CHAPA</p></div>
+</div>
+<button id="cart-btn" class="relative w-11 h-11 bg-[#1c1c1c] rounded-2xl grid place-items-center"><i data-lucide="shopping-bag" class="w-5 h-5"></i><span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-[#F2A33A] text-black text-[11px] font-bold min-w-[20px] h-[20px] px-1 rounded-full grid place-items-center hidden">0</span></button>
+</div>
+</div>
+<div class="px-4 flex gap-2 overflow-x-auto no-scrollbar mt-1">
+<div id="status-pill" class="flex items-center gap-1.5 bg-[#1c1c1c] pl-2.5 pr-3 py-[7px] rounded-full shrink-0"><span id="status-dot" class="w-[7px] h-[7px] rounded-full bg-red-500"></span><span id="status-text" class="text-[13px]">Verificando...</span></div>
+<div class="bg-[#1c1c1c] px-3 py-[7px] rounded-full shrink-0 text-[13px]">Ter a Dom · 18h-23h</div>
+</div>
+<div id="open-banner" class="mx-4 mt-3 bg-[#F2A33A]/10 border border-[#F2A33A]/20 rounded-[16px] p-3"><p id="open-message" class="text-[12.5px] text-[#F2A33A]/90">Carregando...</p></div>
+<div class="px-4 mt-5 flex gap-2 overflow-x-auto no-scrollbar"><button data-cat="burgers" class="tab-btn active bg-[#F2A33A] text-black px-[18px] py-[9px] rounded-full font-semibold text-[14px]">Burgers</button><button data-cat="acompanhamentos" class="tab-btn bg-[#1c1c1c] text-zinc-400 px-[18px] py-[9px] rounded-full text-[14px]">Acompanhamentos</button><button data-cat="bebidas" class="tab-btn bg-[#1c1c1c] text-zinc-400 px-[18px] py-[9px] rounded-full text-[14px]">Bebidas</button><button data-cat="sobremesas" class="tab-btn bg-[#1c1c1c] text-zinc-400 px-[18px] py-[9px] rounded-full text-[14px]">Sobremesa</button></div>
+<div id="product-list" class="px-4 mt-4 space-y-3 pb-28"></div>
+</section>
+
+<section id="screen-cart" class="hidden min-h-screen bg-[#121212]">
+<div class="sticky top-0 z-30 bg-[#121212]/90 backdrop-blur-xl border-b border-white/5"><div class="px-4 h-[64px] flex items-center gap-3"><button onclick="showScreen('menu')" class="w-9 h-9 bg-[#1c1c1c] rounded-xl grid place-items-center">←</button><h2 class="text-[24px] font-black">SEU PEDIDO</h2></div></div>
+<div class="px-4 py-4 pb-32">
+<div id="cart-empty" class="hidden text-center py-16"><p class="text-zinc-500">Carrinho vazio</p><button onclick="showScreen('menu')" class="mt-4 text-[#F2A33A] font-semibold">Ver cardápio</button></div>
+<div id="cart-items" class="space-y-3"></div>
+<div id="cart-content">
+<h3 class="text-[11px] font-bold text-zinc-500 tracking-widest mt-8 mb-3 uppercase">Complete seu pedido</h3>
+<div class="space-y-2.5"><button onclick="quickAdd(100,'Batata Frita',15)" class="w-full flex justify-between border border-[#F2A33A]/40 text-[#F2A33A] rounded-[14px] px-4 py-3.5 text-[14px]">+ Batata Frita <span>R$ 15,00</span></button></div>
+<h3 class="text-[11px] font-bold text-zinc-500 tracking-widest mt-8 mb-3 uppercase">Como você quer receber?</h3>
+<div class="grid grid-cols-2 gap-3"><button data-delivery="entrega" class="delivery-btn bg-[#F2A33A] text-black p-4 rounded-[18px] text-left border-2 border-[#F2A33A]"><p class="font-bold">Entrega</p><p class="text-[12px] opacity-70">na sua casa</p></button><button data-delivery="retirada" class="delivery-btn bg-[#1c1c1c] text-white p-4 rounded-[18px] text-left border-2 border-transparent"><p class="font-bold">Retirada</p><p class="text-[12px] text-zinc-500">no balcão</p></button></div>
+<div id="address-form" class="mt-6 space-y-3"><h4 class="text-[11px] font-bold text-zinc-500 uppercase">Endereço de entrega</h4><div class="grid grid-cols-3 gap-2.5"><input id="addr-rua" placeholder="Rua" class="col-span-2 bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3 text-[14px] text-white"><input id="addr-num" placeholder="Número" class="bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3 text-[14px] text-white"></div><input id="addr-bairro" placeholder="Bairro" class="w-full bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3 text-[14px] text-white"></div>
+<div class="mt-6 space-y-3"><h4 class="text-[11px] font-bold text-zinc-500 uppercase">Seus dados</h4><input id="customer-name" placeholder="Seu nome" class="w-full bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3 text-[14px] text-white"><input id="customer-phone" placeholder="Seu WhatsApp (11) 9..." class="w-full bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3 text-[14px] text-white"></div>
+<button id="go-payment" class="w-full bg-[#F2A33A] text-black font-extrabold py-4 rounded-[18px] mt-6 text-[15px]">Ir para pagamento</button>
+</div>
+</div>
+</section>
+
+<section id="screen-payment" class="hidden min-h-screen bg-[#121212]">
+<div class="sticky top-0 z-30 bg-[#121212]/90 backdrop-blur-xl border-b border-white/5"><div class="px-4 h-[64px] flex items-center gap-3"><button onclick="showScreen('cart')" class="w-9 h-9 bg-[#1c1c1c] rounded-xl grid place-items-center">←</button><h2 class="text-[20px] font-black">PAGAMENTO</h2></div></div>
+<div class="px-4 py-4 pb-32">
+<div class="bg-[#1c1c1c] rounded-[20px] p-4 mb-5"><h3 class="text-[11px] font-bold text-zinc-500 tracking-widest mb-3 uppercase">Resumo do pedido</h3><div id="payment-summary" class="space-y-3 text-[14px]"></div><div class="border-t border-white/10 mt-4 pt-3 space-y-1.5 text-[14px]"><div class="flex justify-between text-zinc-400"><span>Subtotal</span><span id="sum-subtotal">R$ 0,00</span></div><div class="flex justify-between text-zinc-400"><span>Taxa de entrega</span><span id="sum-delivery">R$ 5,00</span></div><div class="flex justify-between font-bold text-[18px] mt-2"><span>Total</span><span class="text-[#F2A33A]" id="sum-total">R$ 0,00</span></div></div></div>
+<h3 class="text-[11px] font-bold text-zinc-500 tracking-widest mb-3 uppercase">Escolha a forma de pagamento</h3>
+<div class="space-y-2.5"><button data-pay="pix" class="pay-btn w-full bg-[#F2A33A] text-black p-4 rounded-[18px] text-left border-2 border-[#F2A33A]"><p class="font-bold">Pix</p><p class="text-[12px] opacity-70">Envia comprovante no WhatsApp</p></button><button data-pay="cartao" class="pay-btn w-full bg-[#1c1c1c] text-white p-4 rounded-[18px] text-left border-2 border-transparent"><p class="font-bold">Cartão na entrega</p></button><button data-pay="dinheiro" class="pay-btn w-full bg-[#1c1c1c] text-white p-4 rounded-[18px] text-left border-2 border-transparent"><p class="font-bold">Dinheiro</p></button></div>
+<div id="troco-field" class="hidden mt-3"><input id="troco-value" placeholder="Troco para quanto? Ex: 100" class="w-full bg-[#1c1c1c] border border-[#2a2a2a] rounded-xl px-3.5 py-3.5 text-[15px] text-white"></div>
+<button id="confirm-order" class="w-full bg-[#22c55e] text-black font-black text-[16px] py-4 rounded-[18px] mt-6">Confirmar e enviar WhatsApp</button>
+<p class="text-[11px] text-zinc-600 text-center mt-3">O pedido será enviado para a loja (11) 97698-0674 e uma confirmação será aberta para o cliente</p>
+</div>
+</section>
+
+<!-- MODAL -->
+<div id="custom-modal" class="fixed inset-0 z-50 hidden"><div class="absolute inset-0 bg-black/80" onclick="closeModal()"></div><div class="absolute bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-[#181818] rounded-t-[28px] max-h-[88vh] flex flex-col"><div class="px-5 pt-5 pb-3 flex gap-3"><img id="modal-img" class="w-20 h-20 rounded-2xl object-cover"><div class="flex-1"><h3 id="modal-name" class="font-bold"></h3><p id="modal-desc" class="text-[12px] text-zinc-500"></p><p class="text-[#F2A33A] font-extrabold text-[18px] mt-1"><span id="modal-price">R$ 28,00</span></p></div></div><div class="overflow-y-auto px-5 pb-5 flex-1"><div class="mt-4"><h4 class="font-bold text-[12px] uppercase mb-2">Ponto da carne</h4><div class="grid grid-cols-3 gap-2"><button data-meat="mal" class="meat-btn bg-[#222] border border-[#333] py-2.5 rounded-xl text-[13px]">Mal</button><button data-meat="ao" class="meat-btn bg-[#F2A33A] text-black border border-[#F2A33A] py-2.5 rounded-xl text-[13px] font-semibold">Ao ponto</button><button data-meat="bem" class="meat-btn bg-[#222] border border-[#333] py-2.5 rounded-xl text-[13px]">Bem</button></div></div><div class="mt-4 space-y-2"><label class="flex justify-between bg-[#222] p-3 rounded-xl"><span><input type="checkbox" data-add="bacon" data-price="5" class="add-check"> Bacon</span><span class="text-[#F2A33A]">+ R$5</span></label><label class="flex justify-between bg-[#222] p-3 rounded-xl"><span><input type="checkbox" data-add="cheddar" data-price="4" class="add-check"> Cheddar extra</span><span class="text-[#F2A33A]">+ R$4</span></label><label class="flex justify-between bg-[#222] p-3 rounded-xl"><span><input type="checkbox" data-add="cebola" data-price="3" class="add-check"> Cebola caramelizada</span><span class="text-[#F2A33A]">+ R$3</span></label><label class="flex justify-between bg-[#1f1f1f] border border-[#F2A33A]/40 p-3 rounded-xl"><span><input type="checkbox" id="combo-check"> Virar combo Batata+Refri</span><span class="text-[#F2A33A]">+ R$15</span></label></div><textarea id="modal-obs" placeholder="Obs: tirar cebola..." class="w-full h-16 bg-[#222] border border-[#2a2a2a] rounded-xl p-3 mt-4 text-[13px] text-white"></textarea></div><div class="p-4 border-t border-white/5"><button id="modal-add" class="w-full bg-[#F2A33A] text-black font-extrabold py-4 rounded-[18px]">Adicionar</button></div></div></div>
+
+<div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1f1f1f] border border-white/10 text-white px-5 py-3 rounded-full text-[14px] z-[100] hidden"></div>
+</div>
+
+<script>
+// ===== SISTEMA DE PRODUTOS SINCRONIZADO COM ADMIN =====
+const DEFAULT_PRODUCTS = {
+burgers:[
+{id:1,name:'Clássico',desc:'blend bovino 160g, queijo, alface, tomate, cebola e molho da casa no pão brioche',price:28,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400'},
+{id:2,name:'Cheddar Bacon',desc:'blend 160g, cheddar derretido, bacon crocante e cebola no pão brioche',price:34,img:'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400'},
+{id:3,name:'Duplo Smash',desc:'dois discos smash, queijo duplo, picles e molho especial',price:39,img:'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400'}
+],
+acompanhamentos:[
+{id:100,name:'Batata Frita',desc:'Porção crocante 300g',price:15,img:'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400'},
+{id:101,name:'Batata c/ Cheddar e Bacon',desc:'Batata, cheddar cremoso e bacon',price:22,img:'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400'}
+],
+bebidas:[
+{id:200,name:'Coca-Cola 350ml',desc:'Gelada',price:6,img:'https://images.unsplash.com/photo-1553456558-aff63285bdd1?w=400'}
+],
+sobremesas:[
+{id:300,name:'Petit Gateau',desc:'Com sorvete',price:18,img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400'}
+]
+};
+
+function getProducts(){
+  try{
+    const saved = localStorage.getItem('tnt_products_db');
+    if(saved){
+      const parsed = JSON.parse(saved);
+      // garante que tem pelo menos burgers
+      if(parsed && Object.keys(parsed).length>0) return parsed;
+    }
+  }catch(e){}
+  return DEFAULT_PRODUCTS;
+}
+
+let products = getProducts();
+
+// recarrega produtos sempre que voltar na aba (caso admin tenha alterado)
+window.addEventListener('focus', ()=>{
+  products = getProducts();
+  const activeCat = document.querySelector('.tab-btn.bg-\\[\\#F2A33A\\]')?.dataset.cat || 'burgers';
+  renderProducts(activeCat);
+});
+document.addEventListener('visibilitychange', ()=>{
+  if(!document.hidden){
+    products = getProducts();
+    const activeCat = document.querySelector('.tab-btn.bg-\\[\\#F2A33A\\]')?.dataset.cat || 'burgers';
+    renderProducts(activeCat);
+  }
+});
+
+let state={cart:JSON.parse(localStorage.getItem('tnt_cart_v3')||'[]'),delivery:'entrega',payment:'pix',currentProduct:null,meat:'ao',adds:{bacon:false,cheddar:false,cebola:false},combo:false};
+const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+function showScreen(n){['menu','cart','payment'].forEach(s=>$('#screen-'+s).classList.toggle('hidden',s!==n));if(n==='cart')renderCart();if(n==='payment')renderPayment();window.scrollTo(0,0);}
+
+function renderProducts(cat='burgers'){
+  const list=$('#product-list');list.innerHTML='';
+  const data = products[cat] || [];
+  if(data.length===0){
+    list.innerHTML='<div class="bg-[#1c1c1c] rounded-[20px] p-8 text-center"><p class="text-zinc-500">Nenhum produto nesta categoria</p><p class="text-[12px] text-zinc-600 mt-2">Cadastre no admin.html</p></div>';
+    return;
+  }
+  data.forEach(p=>{
+    const card=document.createElement('div');card.className='bg-[#1c1c1c] rounded-[20px] p-3 flex gap-3';
+    card.innerHTML=`<img src="${p.img}" class="w-[98px] h-[98px] rounded-[16px] object-cover"><div class="flex-1 flex flex-col"><h3 class="font-bold text-[16px]">${p.name}</h3><p class="text-[12px] text-zinc-500 mt-1 line-clamp-2">${p.desc}</p><div class="mt-auto flex justify-between items-end pt-2.5"><div><p class="text-[10px] text-zinc-600">a partir de</p><p class="text-[22px] font-black text-[#F2A33A]">${fmt(p.price)}</p></div><button data-id="${p.id}" class="montar-btn bg-[#E89B2C] text-black font-bold text-[13px] px-5 h-[36px] rounded-xl">Montar</button></div></div>`;
+    list.appendChild(card);
+  });
+  $$('.montar-btn').forEach(b=>b.onclick=()=>openModal(parseInt(b.dataset.id),cat));
+}
+
+function openModal(id,cat){
+const p=(products[cat]||products.burgers).find(x=>x.id===id);
+if(!p) return;
+state.currentProduct={...p,cat};
+state.meat='ao';state.adds={bacon:false,cheddar:false,cebola:false};state.combo=false;
+$('#modal-img').src=p.img;$('#modal-name').textContent=p.name;$('#modal-desc').textContent=p.desc;
+$('#modal-price').textContent=fmt(p.price);$('#modal-add').innerHTML=`Adicionar • ${fmt(p.price)}`;
+$('#modal-obs').value='';$$('.add-check').forEach(c=>c.checked=false);$('#combo-check').checked=false;
+$$('.meat-btn').forEach(b=>{b.className='meat-btn bg-[#222] border border-[#333] py-2.5 rounded-xl text-[13px]'; if(b.dataset.meat==='ao') b.className='meat-btn bg-[#F2A33A] text-black border border-[#F2A33A] py-2.5 rounded-xl text-[13px] font-semibold';});
+$('#custom-modal').classList.remove('hidden');updateModalPrice();
+}
+function closeModal(){$('#custom-modal').classList.add('hidden');}
+function updateModalPrice(){
+if(!state.currentProduct)return;
+let price=state.currentProduct.price;
+if(state.adds.bacon)price+=5;if(state.adds.cheddar)price+=4;if(state.adds.cebola)price+=3;if(state.combo)price+=15;
+$('#modal-price').textContent=fmt(price);$('#modal-add').innerHTML=`Adicionar • ${fmt(price)}`;
+}
+$$('.meat-btn').forEach(b=>b.onclick=()=>{
+$$('.meat-btn').forEach(x=>x.className='meat-btn bg-[#222] border border-[#333] py-2.5 rounded-xl text-[13px]');
+b.className='meat-btn bg-[#F2A33A] text-black border border-[#F2A33A] py-2.5 rounded-xl text-[13px] font-semibold';
+state.meat=b.dataset.meat;
+});
+$$('.add-check').forEach(c=>c.onchange=()=>{state.adds[c.dataset.add]=c.checked;updateModalPrice();});
+$('#combo-check').onchange=e=>{state.combo=e.target.checked;updateModalPrice();};
+
+$('#modal-add').onclick=()=>{
+const p=state.currentProduct;
+let price=p.price;
+const adds=[];const addsDetail=[];
+if(state.adds.bacon){price+=5;adds.push('Bacon');addsDetail.push('Bacon + R$ 5,00')}
+if(state.adds.cheddar){price+=4;adds.push('Cheddar extra');addsDetail.push('Cheddar extra + R$ 4,00')}
+if(state.adds.cebola){price+=3;adds.push('Cebola caramelizada');addsDetail.push('Cebola caramelizada + R$ 3,00')}
+if(state.combo){price+=15}
+const item={id:Date.now(),pid:p.id,name:p.name,img:p.img,price,base:p.price,qty:1,meat:p.cat==='burgers'?state.meat:null,adds,addsDetail,combo:state.combo,obs:$('#modal-obs').value.trim()};
+state.cart.push(item);
+saveCart();updateBadge();closeModal();showToast('Adicionado ao pedido');
+};
+
+function quickAdd(id,name,price){
+state.cart.push({id:Date.now(),pid:id,name,price,qty:1,img:'',adds:[],addsDetail:[],combo:false,obs:''});
+saveCart();updateBadge();renderCart();showToast(name+' adicionado');
+}
+function saveCart(){localStorage.setItem('tnt_cart_v3',JSON.stringify(state.cart));}
+function updateBadge(){const total=state.cart.reduce((s,i)=>s+i.qty,0);const b=$('#cart-badge');if(total>0){b.textContent=total;b.classList.remove('hidden');}else b.classList.add('hidden');}
+
+function renderCart(){
+const wrap=$('#cart-items');const empty=$('#cart-empty');const content=$('#cart-content');
+wrap.innerHTML='';
+if(state.cart.length===0){empty.classList.remove('hidden');content.classList.add('hidden');return;}
+empty.classList.add('hidden');content.classList.remove('hidden');
+state.cart.forEach((it,idx)=>{
+let details=[];
+if(it.meat){let meatLabel = it.meat==='ao'?'Ao ponto':it.meat==='mal'?'Mal passado':'Bem passado';details.push(`Ponto: ${meatLabel}`);}
+if(it.addsDetail && it.addsDetail.length>0){details = details.concat(it.addsDetail);} else if(it.adds && it.adds.length>0){details = details.concat(it.adds);}
+if(it.combo) details.push('Virar combo - Batata + refri + R$ 15,00');
+if(it.obs) details.push(`Obs: ${it.obs}`);
+const el=document.createElement('div');
+el.className='bg-[#1c1c1c] rounded-[18px] p-3 flex gap-3 border border-white/5';
+el.innerHTML=`
+<img src="${it.img||'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200'}" class="w-[64px] h-[64px] rounded-xl object-cover bg-[#252525] shrink-0">
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start gap-2">
+<h4 class="font-bold text-[15px] leading-tight">${it.name}</h4>
+<button onclick="removeItem(${idx})" class="text-zinc-500 hover:text-red-400 text-[18px] leading-none">✕</button>
+</div>
+${details.length>0 ? `<div class="mt-1.5 space-y-1">${details.map(d=>`<p class="text-[12px] text-zinc-400 bg-[#252525] px-2 py-1 rounded-lg inline-block mr-1">✓ ${d}</p>`).join('')}</div>` : `<p class="text-[12px] text-zinc-500 mt-1">Item simples</p>`}
+<div class="flex justify-between items-center mt-3">
+<p class="text-[#F2A33A] font-black text-[16px]">${fmt(it.price*it.qty)}</p>
+<div class="flex items-center gap-1 bg-[#0f0f0f] rounded-[10px] p-1 border border-white/5">
+<button onclick="changeQty(${idx},-1)" class="w-7 h-7 grid place-items-center hover:bg-white/10 rounded-lg">-</button>
+<span class="w-6 text-center font-bold text-[14px]">${it.qty}</span>
+<button onclick="changeQty(${idx},1)" class="w-7 h-7 grid place-items-center hover:bg-white/10 rounded-lg">+</button>
+</div>
+</div>
+</div>
+`;
+wrap.appendChild(el);
+});
+}
+
+function changeQty(i,d){state.cart[i].qty+=d;if(state.cart[i].qty<=0)state.cart.splice(i,1);saveCart();updateBadge();renderCart();}
+function removeItem(i){state.cart.splice(i,1);saveCart();updateBadge();renderCart();showToast('Item removido');}
+
+$$('.delivery-btn').forEach(b=>b.onclick=()=>{
+$$('.delivery-btn').forEach(x=>{x.classList.remove('bg-[#F2A33A]','text-black','border-[#F2A33A]');x.classList.add('bg-[#1c1c1c]','text-white','border-transparent');});
+b.classList.add('bg-[#F2A33A]','text-black','border-[#F2A33A]');b.classList.remove('bg-[#1c1c1c]','text-white','border-transparent');
+state.delivery=b.dataset.delivery;
+$('#address-form').style.display=state.delivery==='entrega'?'block':'none';
+});
+
+$('#go-payment').onclick=()=>{
+if(state.cart.length===0){showToast('Adicione itens');return;}
+const name=$('#customer-name').value.trim();const phone=$('#customer-phone').value.trim();
+if(!name||!phone){showToast('Preencha nome e WhatsApp');return;}
+if(state.delivery==='entrega'){
+if(!$('#addr-rua').value.trim()||!$('#addr-num').value.trim()||!$('#addr-bairro').value.trim()){showToast('Preencha endereço');return;}
+}
+showScreen('payment');
+};
+
+function renderPayment(){
+const wrap=$('#payment-summary');wrap.innerHTML='';let subtotal=0;
+state.cart.forEach(it=>{
+subtotal+=it.price*it.qty;
+const div=document.createElement('div');
+div.className='bg-[#252525] rounded-xl p-3';
+let extrasHtml='';
+if(it.addsDetail && it.addsDetail.length) extrasHtml = `<p class="text-[11px] text-zinc-400 mt-1">${it.addsDetail.join(' • ')}</p>`;
+else if(it.adds && it.adds.length) extrasHtml = `<p class="text-[11px] text-zinc-400 mt-1">${it.adds.join(' • ')}</p>`;
+if(it.combo) extrasHtml += `<p class="text-[11px] text-[#F2A33A] mt-1">+ Virar combo - Batata + refri</p>`;
+div.innerHTML=`<div class="flex justify-between"><span class="font-semibold">${it.qty}x ${it.name}</span><span class="font-bold text-[#F2A33A]">${fmt(it.price*it.qty)}</span></div>${extrasHtml}`;
+wrap.appendChild(div);
+});
+const fee=state.delivery==='entrega'?5:0;
+$('#sum-subtotal').textContent=fmt(subtotal);
+$('#sum-delivery').textContent=fmt(fee);
+$('#sum-total').textContent=fmt(subtotal+fee);
+}
+
+$$('.pay-btn').forEach(b=>b.onclick=()=>{
+$$('.pay-btn').forEach(x=>{x.classList.remove('bg-[#F2A33A]','text-black','border-[#F2A33A]');x.classList.add('bg-[#1c1c1c]','text-white','border-transparent');});
+b.classList.add('bg-[#F2A33A]','text-black','border-[#F2A33A]');b.classList.remove('bg-[#1c1c1c]','text-white','border-transparent');
+state.payment=b.dataset.pay;
+$('#troco-field').classList.toggle('hidden',state.payment!=='dinheiro');
+});
+
+$('#confirm-order').onclick=()=>{
+const name=$('#customer-name').value.trim();
+const phoneRaw=$('#customer-phone').value.replace(/\D/g,'');
+const phoneClient = phoneRaw.startsWith('55')?phoneRaw:'55'+phoneRaw;
+let address='';
+if(state.delivery==='entrega'){
+address=`${$('#addr-rua').value}, ${$('#addr-num').value} - ${$('#addr-bairro').value}`;
+}
+let subtotal=0;
+const itemsText=state.cart.map(it=>{
+subtotal+=it.price*it.qty;
+let line=`${it.qty}x ${it.name}`;
+let det=[];
+if(it.meat) det.push(it.meat==='ao'?'Ao ponto':it.meat==='mal'?'Mal passado':'Bem passado');
+if(it.adds && it.adds.length) det.push(it.adds.join(', '));
+if(it.combo) det.push('Combo: Batata + refri');
+if(it.obs) det.push(`Obs: ${it.obs}`);
+if(det.length) line+=` (${det.join(' | ')})`;
+line+=` - ${fmt(it.price*it.qty)}`;
+return line;
+}).join('\n');
+
+const total=subtotal+(state.delivery==='entrega'?5:0);
+const payMap={pix:'Pix',cartao:'Cartão na entrega',dinheiro:'Dinheiro'+($('#troco-value').value?` (Troco para R$ ${$('#troco-value').value})`:'')};
+const msgLoja=`🍔 *TNT BURGUER - NOVO PEDIDO* 🍔\n\n*Cliente:* ${name}\n*WhatsApp cliente:* ${$('#customer-phone').value}\n*Receber:* ${state.delivery==='entrega'?'Entrega':'Retirada'}${address?`\n*Endereço:* ${address}`:''}\n\n*ITENS:*\n${itemsText}\n\n*Subtotal:* ${fmt(subtotal)}\n*Taxa:* ${fmt(state.delivery==='entrega'?5:0)}\n*Total:* ${fmt(total)}\n*Pagamento:* ${payMap[state.payment]}\n\nObrigado!`;
+const msgCliente=`Olá ${name}! 🍔\n\nSeu pedido na *TNT BURGUER* foi recebido!\n\n${itemsText}\n\n*Total: ${fmt(total)}*\n*Pagamento: ${payMap[state.payment]}*\n*Receber: ${state.delivery==='entrega'?`Entrega em ${address}`:'Retirada no balcão'}*\n\nJá estamos preparando! Em breve entraremos em contato.\n\n*TNT BURGUER* - Obrigado pela preferência!`;
+localStorage.setItem('tnt_last',JSON.stringify({items:state.cart}));
+const urlLoja=`https://wa.me/5511976980674?text=${encodeURIComponent(msgLoja)}`;
+window.open(urlLoja,'_blank');
+setTimeout(()=>{
+if(phoneClient.length>=12){
+const urlCliente=`https://wa.me/${phoneClient}?text=${encodeURIComponent(msgCliente)}`;
+window.open(urlCliente,'_blank');
+}
+showToast('Pedidos enviados no WhatsApp!');
+},1200);
+setTimeout(()=>{state.cart=[];saveCart();updateBadge();showScreen('menu');},2000);
+};
+
+function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}
+
+$$('.tab-btn').forEach(btn=>btn.onclick=()=>{
+$$('.tab-btn').forEach(b=>{b.classList.remove('bg-[#F2A33A]','text-black');b.classList.add('bg-[#1c1c1c]','text-zinc-400');});
+btn.classList.add('bg-[#F2A33A]','text-black');btn.classList.remove('bg-[#1c1c1c]','text-zinc-400');
+renderProducts(btn.dataset.cat);
+});
+$('#cart-btn').onclick=()=>showScreen('cart');
+
+function checkOpenStatus(){
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours() + now.getMinutes()/60;
+  const isOpenDay = day !== 1;
+  const isOpenHour = hour >= 18 && hour < 23;
+  const isOpen = isOpenDay && isOpenHour;
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  const banner = document.getElementById('open-banner');
+  const msg = document.getElementById('open-message');
+  if(isOpen){
+    dot.className = 'w-[7px] h-[7px] rounded-full bg-green-500 animate-pulse';
+    txt.textContent = 'Aberto'; txt.className = 'text-[13px] text-green-400';
+    if(banner){banner.className = 'mx-4 mt-3 bg-green-500/10 border border-green-500/20 rounded-[16px] p-3';}
+    if(msg){msg.innerHTML = '<b class="text-green-400">Estamos abertos agora!</b> Entrega em 40-60 min.'; msg.className='text-[12.5px] text-green-400/90';}
+  } else {
+    dot.className = 'w-[7px] h-[7px] rounded-full bg-red-500';
+    txt.textContent = 'Fechado'; txt.className = 'text-[13px] text-zinc-400';
+    if(banner){banner.className = 'mx-4 mt-3 bg-[#F2A33A]/10 border border-[#F2A33A]/20 rounded-[16px] p-3';}
+    if(msg){
+      if(day===1){msg.innerHTML = '<b class="text-[#F2A33A]">Fechado hoje.</b> Abrimos amanhã Ter às 18:00.';}
+      else if(hour < 18){msg.innerHTML = '<b class="text-[#F2A33A]">Estamos fechados agora.</b> Abrimos hoje às 18:00.';}
+      else {msg.innerHTML = '<b class="text-[#F2A33A]">Encerrado hoje.</b> Voltamos amanhã às 18:00.';}
+      msg.className='text-[12.5px] text-[#F2A33A]/90';
+    }
+  }
+  return isOpen;
+}
+
+checkOpenStatus();renderProducts('burgers');updateBadge();showScreen('menu');
+setInterval(checkOpenStatus,60000);
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registrado')).catch(err => console.log('SW erro'));
+  });
+}
+</script>
+</body>
+</html>
